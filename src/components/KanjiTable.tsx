@@ -18,6 +18,10 @@ const KanjiTable = () => {
         fetchKanjis()
     }, [])
 
+    useEffect(() => {
+        console.log(kanjiList)
+    })
+
     const columns = [
         {
             title: 'Kanji',
@@ -33,6 +37,14 @@ const KanjiTable = () => {
             title: 'JLPT',
             dataIndex: 'jlptLevel',
             key: 'jlptLevel',
+        },
+        {
+            title: "Sentence Count",
+            dataIndex: "exampleSentences",
+            key: 'exampleSentences',
+            render: (sentences: any[]) => (
+                <span>{sentences?.length}</span>
+            ),
         },
 
         {
