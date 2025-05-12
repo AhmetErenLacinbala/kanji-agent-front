@@ -2,11 +2,19 @@ import { useEffect, useState } from 'react'
 import { Card, Button, Radio, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import ApiService, { API_URL } from '../services/api'
+import { Kanji, Sentence } from '../models'
 
 const Flashcard = () => {
     const [kanjis, setKanjis] = useState([])
-    const [selectedSentence, setSelectedSentence] = useState(null)
-    const [choices, setChoices] = useState([])
+    const [selectedSentence, setSelectedSentence] = useState<Sentence>({
+        id: "",
+        sentence: "",
+        meaning: "",
+        kana: "",
+        usedKanjiForm: "",
+        kanjiId: "",
+    })
+    const [choices, setChoices] = useState<string[]>([])
     const [selectedChoice, setSelectedChoice] = useState(null)
     const [showAnswer, setShowAnswer] = useState(false)
     const [showMeaning, setShowMeaning] = useState(false)
@@ -34,7 +42,7 @@ const Flashcard = () => {
     }, [kanjis])
 
     const generateQuestion = () => {
-        const candidates = kanjis.filter(k => k.exampleSentences?.length > 0)
+        const candidates: Kanji[] = kanjis.filter((k: Kanji) => k.exampleSentences.length > 0)
         if (candidates.length === 0) return
 
         const allSentences = candidates.flatMap(k =>

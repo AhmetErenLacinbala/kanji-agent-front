@@ -1,11 +1,11 @@
-export interface Kanji{
-    id: string;
-    kanji: string;
-    meaning: string;
-    kana: string[];
-    kanjiPoint: number;
-    jlptLevel: number;
-    exampleSentence?: Sentence[];
+export interface Kanji {
+  id: string;
+  kanji: string;
+  meaning: string;
+  kana: string[];
+  kanjiPoint: number;
+  jlptLevel: number;
+  exampleSentences: Sentence[];
 }
 
 export interface CreateKanjiDto {
@@ -16,12 +16,11 @@ export interface CreateKanjiDto {
   jlptLevel: number
 }
 
-export interface Sentence{
-    id: string,
-    sentence: string;
-    meaning: string;
-    kana: string;
-    counter: number;
-    kanjiId: string;
-    kanji: string;
+export interface Sentence {
+  id: string,
+  sentence: string;
+  meaning: string;
+  kana: string;
+  usedKanjiForm: string;
+  kanjiId: string;
 }
