@@ -23,4 +23,5 @@ export interface Sentence {
   kana: string;
   usedKanjiForm: string;
   kanjiId: string;
+  whitelist: string[];
 }

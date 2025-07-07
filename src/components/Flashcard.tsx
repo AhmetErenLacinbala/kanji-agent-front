@@ -3,9 +3,10 @@ import { Card, Button, Radio, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import ApiService, { API_URL } from '../services/api'
 import { Kanji, Sentence } from '../models'
+import { getRandomItems } from '../utils/funcs'
 
 const Flashcard = () => {
-    const [kanjis, setKanjis] = useState([])
+    const [kanjis, setKanjis] = useState<Kanji[]>([])
     const [selectedSentence, setSelectedSentence] = useState<Sentence>({
         id: "",
         sentence: "",
@@ -13,9 +14,10 @@ const Flashcard = () => {
         kana: "",
         usedKanjiForm: "",
         kanjiId: "",
+        whitelist: [],
     })
-    const [choices, setChoices] = useState<string[]>([])
     const [selectedChoice, setSelectedChoice] = useState(null)
+    const [choices, setChoices] = useState<string[]>([])
     const [showAnswer, setShowAnswer] = useState(false)
     const [showMeaning, setShowMeaning] = useState(false)
     const [showKana, setShowKana] = useState(false)
@@ -25,8 +27,9 @@ const Flashcard = () => {
     useEffect(() => {
         const fetchKanjis = async () => {
             try {
-                const response = await ApiService.get(`${API_URL}/kanji`)
-                setKanjis(response.data)
+                const response = await ApiService.get(`${API_URL}/kanji/paginated?from=0&take=50
+`)
+                setKanjis(response.data.data)
             } catch (error) {
                 console.error('Failed to fetch kanjis:', error)
             }
@@ -36,36 +39,25 @@ const Flashcard = () => {
     }, [])
 
     useEffect(() => {
+
         if (kanjis.length > 0) {
             generateQuestion()
+            console.log(kanjis.length)
         }
     }, [kanjis])
 
     const generateQuestion = () => {
-        const candidates: Kanji[] = kanjis.filter((k: Kanji) => k.exampleSentences.length > 0)
-        if (candidates.length === 0) return
 
-        const allSentences = candidates.flatMap(k =>
-            k.exampleSentences.map(sentence => ({
-                ...sentence,
-                kanji: k.kanji,
-            }))
-        )
+        const randomKanji = kanjis[Math.floor(Math.random() * kanjis.length)]
 
-        const target = allSentences[Math.floor(Math.random() * allSentences.length)]
+        const sentence = getRandomItems(randomKanji.exampleSentences, 1)[0]
+        setSelectedSentence(sentence)
+        let choices = getRandomItems(sentence.whitelist, 5);
+        choices = getRandomItems([...choices, sentence.usedKanjiForm], 6)
 
-        const allForms = Array.from(
-            new Set(allSentences.map(s => s.usedKanjiForm).filter(k => k !== target.usedKanjiForm))
-        )
 
-        const randomDistractors = allForms
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 5)
+        setChoices(choices)
 
-        const finalChoices = [...randomDistractors, target.usedKanjiForm].sort(() => 0.5 - Math.random())
-
-        setSelectedSentence(target)
-        setChoices(finalChoices)
         setSelectedChoice(null)
         setShowAnswer(false)
         setShowKana(false)

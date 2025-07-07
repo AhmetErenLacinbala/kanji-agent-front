@@ -10,6 +10,7 @@ const KanjiTable = () => {
     const [modalVisible, setModalVisible] = useState(false)
 
     const fetchKanjis = async () => {
+        console.log("Fetching kanjis", API_URL);
         const response = await ApiService.get(`${API_URL}/kanji`)
         setKanjiList(response.data)
     }
