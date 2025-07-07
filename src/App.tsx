@@ -8,7 +8,7 @@ import Login from './components/Login';
 
 function App() {
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [kanjiForm, setKanjiForm] = useState(false)
+  //const [kanjiForm, setKanjiForm] = useState(false)
   const [loginModal, setLoginModal] = useState(false);
   const navigate = useNavigate()
 
@@ -33,20 +33,13 @@ function App() {
       </div>
 
       <FloatButton.Group trigger="hover" type="primary" style={{ right: 24, bottom: 24 }}>
-        <FloatButton description="Add" onClick={() => setKanjiForm((p) => !p)} />
+
         <FloatButton description="List" onClick={() => setDrawerOpen(true)} />
       </FloatButton.Group>
 
 
 
-      <Modal
-        title="Add New Kanji"
-        open={kanjiForm}
-        onCancel={() => setKanjiForm(false)}
-        footer={null}
-      >
-        <KanjiForm />
-      </Modal>
+
 
       <Drawer
         title="Kanji List"
@@ -62,3 +55,16 @@ function App() {
 }
 
 export default App
+/*
+
+ <FloatButton description="Add" onClick={() => setKanjiForm((p) => !p)} />
+<Modal
+        title="Add New Kanji"
+        open={kanjiForm}
+        onCancel={() => setKanjiForm(false)}
+        footer={null}
+      >
+        <KanjiForm />
+      </Modal>
+
+*/
