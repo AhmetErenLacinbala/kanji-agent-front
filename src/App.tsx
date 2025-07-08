@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { FloatButton, Drawer, Modal, Avatar } from 'antd'
-import KanjiForm from './components/KanjiForm'
 import KanjiTable from './components/KanjiTable'
 import { UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom'
 import Login from './components/Login';
+import DeckModal from './components/DeckModal';
 
 function App() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   //const [kanjiForm, setKanjiForm] = useState(false)
   const [loginModal, setLoginModal] = useState(false);
+  const [deckModal, setDeckModal] = useState(false);
   const navigate = useNavigate()
 
   return (
@@ -23,12 +24,24 @@ function App() {
         footer={null}>
         <Login />
       </Modal>
-      <div className="fixed inset-0 flex justify-center items-center z-10">
+      <Modal
+        open={deckModal}
+        onCancel={() => setDeckModal(false)}
+        footer={null}>
+        <DeckModal />
+      </Modal>
+      <div className="fixed flex gap-4 flex-col inset-0 flex justify-center items-center z-10">
         <button
           className="bg-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-600 transition"
           onClick={() => navigate('/flashcards')}
         >
           Go to Flashcards
+        </button>
+        <button
+          className="bg-blue-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-600 transition"
+          onClick={() => setDeckModal(true)}
+        >
+          Decks
         </button>
       </div>
 

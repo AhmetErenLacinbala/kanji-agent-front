@@ -25,3 +25,22 @@ export interface Sentence {
   kanjiId: string;
   whitelist: string[];
 }
+
+export interface FlashcardModel {
+  deckId?: string,
+  kanjiId?: string,
+  id?: string,
+  kanji: Kanji
+}
+
+export interface Deck {
+  id: string
+  name?: string
+  isAnonymous: boolean
+  // Add other deck properties as needed
+}
+
+export interface DeckServiceResult {
+  deck: Deck
+  flashcards: FlashcardModel[]
+}
