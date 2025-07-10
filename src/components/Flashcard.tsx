@@ -143,8 +143,19 @@ const Flashcard = () => {
                     <h2 className="text-xl mb-2">Select the correct kanji</h2>
                     <p className="text-2xl mb-2">
                         {selectedSentence.tokenized.map((word, index) => {
-                            if (word.surface === selectedSentence.usedKanjiForm)
+                            if (word.surface === selectedSentence.usedKanjiForm) {
+                                if (showAnswer && selectedChoice === selectedSentence.usedKanjiForm) {
+                                    return (
+                                        <ruby key={index}>
+                                            <p className=' text-green-500'>{word.surface}</p>
+                                            <rt>{word.kana === word.surface ? "" : word.kana}</rt>
+                                        </ruby>)
+
+                                }
+
                                 return <>⬜</>
+
+                            }
                             return <Word key={index} word={word} />
                         }
                         )}
@@ -152,7 +163,6 @@ const Flashcard = () => {
 
 
                     {showKana && <p className="text-gray-500 mb-2"> {selectedSentence.tokenized.map((word) => {
-
                         return <>{word.kana}</>
                     }
                     )}</p>}
