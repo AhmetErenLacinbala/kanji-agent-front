@@ -24,6 +24,13 @@ export interface Sentence {
   usedKanjiForm: string;
   kanjiId: string;
   whitelist: string[];
+  tokenized: WordType[]
+}
+
+export type WordType = {
+  surface: string
+  kana: string
+  pos: string
 }
 
 export interface FlashcardModel {

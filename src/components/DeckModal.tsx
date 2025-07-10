@@ -25,6 +25,7 @@ export default function DeckModal() {
 
     return (
         <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow">
+            <h2>THIS PAGE IS NOT IMPLEMENTED YET, NOT FUNCTIONAL</h2>
             <h2 className="text-xl font-semibold mb-4">Edit Deck</h2>
 
             <div className="mb-4 flex items-center justify-between">

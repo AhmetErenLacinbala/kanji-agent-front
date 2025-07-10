@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { Sentence, Deck, FlashcardModel } from '../models'
 import { getRandomItems } from '../utils/funcs'
 import { createDeck } from '../services/deckService'
+import Word from './Word'
+
+
 
 const Flashcard = () => {
     const [flashcards, setFlashcards] = useState<FlashcardModel[]>([])
@@ -16,6 +19,7 @@ const Flashcard = () => {
         usedKanjiForm: "",
         kanjiId: "",
         whitelist: [],
+        tokenized: []
     })
     const [selectedChoice, setSelectedChoice] = useState(null)
     const [choices, setChoices] = useState<string[]>([])
@@ -138,10 +142,20 @@ const Flashcard = () => {
                 <Card className="w-full max-w-xl text-center">
                     <h2 className="text-xl mb-2">Select the correct kanji</h2>
                     <p className="text-2xl mb-2">
-                        {selectedSentence.sentence.replace(selectedSentence.usedKanjiForm, '⬜')}
+                        {selectedSentence.tokenized.map((word, index) => {
+                            if (word.surface === selectedSentence.usedKanjiForm)
+                                return <>⬜</>
+                            return <Word key={index} word={word} />
+                        }
+                        )}
                     </p>
 
-                    {showKana && <p className="text-gray-500 mb-2">{selectedSentence.kana}</p>}
+
+                    {showKana && <p className="text-gray-500 mb-2"> {selectedSentence.tokenized.map((word) => {
+
+                        return <>{word.kana}</>
+                    }
+                    )}</p>}
                     {showMeaning && (
                         <p className="text-md italic text-blue-700 mb-2">{selectedSentence.meaning}</p>
                     )}

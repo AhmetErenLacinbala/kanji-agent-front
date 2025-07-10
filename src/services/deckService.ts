@@ -35,9 +35,6 @@ const createAnonymousDeck = async (): Promise<Deck> => {
 const fetchDeckFlashcards = async (deckId: string): Promise<FlashcardModel[]> => {
     const url = `${API_URL}/deck/${deckId}/flashcards`
     const response = await ApiService.get(url)
-    console.log('Flashcards fetched:', response.data.kanjis)
-    console.log('Flashcards fetched:', url)
-    console.log('Flashcards fetched:', deckId)
     return response.data.kanjis
 }
 
