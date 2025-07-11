@@ -2,14 +2,14 @@ import React from 'react';
 import { WordType } from '../models';
 import { analyzeSurfaceKanaAlignment } from '../utils/funcs';
 
-const Word: React.FC<{ word: WordType }> = ({ word }) => {
+const Word: React.FC<{ word: WordType, correct?: boolean }> = ({ word, correct }) => {
     const segments = analyzeSurfaceKanaAlignment(word.surface, word.kana);
 
     return (
         <>
             {segments.map((seg, idx) =>
                 seg.isKanjis ? (
-                    <ruby key={idx}>
+                    <ruby className={correct ? " text-green-500" : ""} key={idx}>
                         {seg.kanji}
                         <rt>{seg.text}</rt>
                     </ruby>

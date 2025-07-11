@@ -146,10 +146,7 @@ const Flashcard = () => {
                             if (word.surface === selectedSentence.usedKanjiForm) {
                                 if (showAnswer && selectedChoice === selectedSentence.usedKanjiForm) {
                                     return (
-                                        <ruby key={index}>
-                                            <p className=' text-green-500'>{word.surface}</p>
-                                            <rt>{word.kana === word.surface ? "" : word.kana}</rt>
-                                        </ruby>)
+                                        <Word key={index} word={word} correct={true} />)
 
                                 }
 
