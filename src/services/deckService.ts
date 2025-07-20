@@ -1,76 +1,55 @@
-import ApiService, { API_URL } from './api'
+import ApiService from './api'
 import { Deck, DeckServiceResult, FlashcardModel } from '../models'
 import { useAuthStore } from '../stores/authStore'
 
-// Constants
-const DECK_STORAGE_KEY = 'anonymous-deck-id'
-
-// Helper functions
-const getAnonymousDeckId = (): string | null => {
-    return localStorage.getItem(DECK_STORAGE_KEY)
-}
-
-const setAnonymousDeckId = (deckId: string): void => {
-    localStorage.setItem(DECK_STORAGE_KEY, deckId)
-}
-
-const isUserSignedIn = (): boolean => {
-    const { isAuthenticated } = useAuthStore.getState()
-    return isAuthenticated
-}
-
 // API functions
-const fetchDeck = async (deckId: string, isAnonymous: boolean = false): Promise<Deck> => {
-    const url = `${API_URL}/deck/${deckId}${isAnonymous ? '?isAnonymous=true' : ''}`
-    const response = await ApiService.get(url)
+const fetchUserDecks = async (): Promise<Deck[]> => {
+    const response = await ApiService.get('/deck/user/decks')
     return response.data
 }
 
-const createAnonymousDeck = async (): Promise<Deck> => {
-    const url = `${API_URL}/deck?addRandomKanji=true&isAnonymous=true`
-    const response = await ApiService.post(url)
+const createUserDeck = async (): Promise<Deck> => {
+    const response = await ApiService.post('/deck', { addRandomKanji: true })
     return response.data
 }
 
 const fetchDeckFlashcards = async (deckId: string): Promise<FlashcardModel[]> => {
-    const url = `${API_URL}/deck/${deckId}/flashcards`
-    const response = await ApiService.get(url)
+    const response = await ApiService.get(`/deck/${deckId}/flashcards`)
     return response.data.kanjis
 }
 
 /**
- * Main service function to create/get deck and fetch flashcards
- * This handles the entire flashcard flow based on authentication status
+ * Main service function to get or create deck and fetch flashcards
+ * This handles the entire flashcard flow for authenticated users (both guest and registered)
  */
 export const createDeck = async (): Promise<DeckServiceResult> => {
     try {
+        const { ensureAuth } = useAuthStore.getState()
+
+
+        await ensureAuth()
+
+
+        let userDecks: Deck[]
+        try {
+            console.log('🔍 Fetching existing user decks...')
+            userDecks = await fetchUserDecks()
+            console.log('✅ Existing decks found:', userDecks.length, userDecks)
+        } catch (error) {
+            console.warn('❌ Failed to fetch user decks, will create new one:', error)
+            userDecks = []
+        }
+
         let deck: Deck
 
-        if (isUserSignedIn()) {
-            // TODO: Handle authenticated user deck logic
-            // For now, we'll throw an error to indicate this needs implementation
-            throw new Error('Authenticated user deck handling not yet implemented')
+        if (userDecks.length > 0) {
+            // Use the first deck (or implement logic to choose specific deck)
+            console.log('🎯 Using existing deck:', userDecks[0])
+            deck = userDecks[0]
         } else {
-            // Handle anonymous user
-            const existingDeckId = getAnonymousDeckId()
-
-            if (existingDeckId) {
-                // Try to fetch existing deck
-                try {
-                    console.log('Fetching existing anonymous deck:', existingDeckId)
-                    deck = await fetchDeck(existingDeckId, true)
-                } catch (error) {
-                    console.warn('Failed to fetch existing deck, creating new one:', error)
-                    // If deck doesn't exist or can't be fetched, create a new one
-                    deck = await createAnonymousDeck()
-                    setAnonymousDeckId(deck.id)
-                }
-            } else {
-                // No existing deck, create new one
-                console.log('Creating new anonymous deck')
-                deck = await createAnonymousDeck()
-                setAnonymousDeckId(deck.id)
-            }
+            // Create a new deck for the user
+            console.log('🆕 No existing decks found - creating new deck for user')
+            deck = await createUserDeck()
         }
 
         // Fetch flashcards for the deck
@@ -89,11 +68,17 @@ export const createDeck = async (): Promise<DeckServiceResult> => {
 }
 
 /**
- * Clear anonymous deck from localStorage
- * Useful for testing or when user wants to start fresh
+ * Get user's decks
  */
-export const clearAnonymousDeck = (): void => {
-    localStorage.removeItem(DECK_STORAGE_KEY)
+export const getUserDecks = async (): Promise<Deck[]> => {
+    try {
+        const { ensureAuth } = useAuthStore.getState()
+        await ensureAuth()
+        return await fetchUserDecks()
+    } catch (error) {
+        console.error('Error getting user decks:', error)
+        throw error
+    }
 }
 
 /**
@@ -101,27 +86,33 @@ export const clearAnonymousDeck = (): void => {
  */
 export const getCurrentDeck = async (): Promise<Deck | null> => {
     try {
-        if (isUserSignedIn()) {
-            // TODO: Handle authenticated user deck logic
-            return null
-        } else {
-            const deckId = getAnonymousDeckId()
-            if (deckId) {
-                return await fetchDeck(deckId, true)
-            }
-            return null
-        }
+        const decks = await getUserDecks()
+        return decks.length > 0 ? decks[0] : null
     } catch (error) {
         console.error('Error getting current deck:', error)
         return null
     }
 }
 
-// Export as object for easier importing
+/**
+ * Create a new deck for the user
+ */
+export const createNewDeck = async (): Promise<Deck> => {
+    try {
+        const { ensureAuth } = useAuthStore.getState()
+        await ensureAuth()
+        return await createUserDeck()
+    } catch (error) {
+        console.error('Error creating new deck:', error)
+        throw error
+    }
+}
+
 export const deckService = {
     createDeck,
-    clearAnonymousDeck,
-    getCurrentDeck
+    getUserDecks,
+    getCurrentDeck,
+    createNewDeck
 }
 
 export default deckService 

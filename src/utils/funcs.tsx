@@ -167,3 +167,16 @@ export function analyzeSurfaceKanaAlignment(surface: string, kana: string): Segm
 
     return enriched;
 }
+
+
+export const getDeviceId = (): string => {
+    const storedDeviceId = localStorage.getItem('deviceId');
+    if (storedDeviceId) {
+        return storedDeviceId;
+    }
+
+    // Generate a new device ID using crypto.randomUUID() if available, fallback to timestamp + random
+    const deviceId = crypto.randomUUID ? crypto.randomUUID() : `device_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    localStorage.setItem('deviceId', deviceId);
+    return deviceId;
+};

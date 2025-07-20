@@ -1,38 +1,47 @@
 import React, { useState } from 'react'
 import { Button, Checkbox, Form, Input, message, Typography } from 'antd'
 import type { FormProps } from 'antd'
-import ApiService, { API_URL } from '../services/api'
+import { useAuthStore } from '../stores/authStore'
 
 const { Title } = Typography
 
 type FieldType = {
+    emailOrUsername?: string
     email?: string
     password?: string
+    username?: string
     remember?: boolean
 }
 
-const AuthForm: React.FC = () => {
+interface AuthFormProps {
+    onSuccess?: () => void
+}
+
+const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
     const [isRegister, setIsRegister] = useState(false)
+    const { login, register, isLoading } = useAuthStore()
 
     const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
         try {
-            const endpoint = isRegister ? '/auth/register' : '/auth/login'
-
-            const res = await ApiService.post(`${API_URL}${endpoint}`, {
-                email: values.email,
-                password: values.password,
-            })
-
-            message.success(isRegister ? 'Registered successfully!' : 'Logged in!')
-            console.log('Success:', res.data)
-
-            if (res.data.accessToken) {
-                localStorage.setItem('accessToken', res.data.accessToken)
-                // optionally redirect or update app state
+            if (isRegister) {
+                await register({
+                    email: values.email!,
+                    username: values.username!,
+                    password: values.password!
+                })
+                message.success('Registered and logged in successfully!')
+            } else {
+                await login({
+                    emailOrUsername: values.emailOrUsername!,
+                    password: values.password!
+                })
+                message.success('Logged in successfully!')
             }
+            // Close the modal after successful auth
+            onSuccess?.()
         } catch (err) {
             console.error(err)
-            message.error('Auth failed')
+            message.error(isRegister ? 'Registration failed' : 'Login failed')
         }
     }
 
@@ -54,13 +63,33 @@ const AuthForm: React.FC = () => {
                 onFinishFailed={onFinishFailed}
                 autoComplete="off"
             >
-                <Form.Item<FieldType>
-                    label="Email"
-                    name="email"
-                    rules={[{ required: true, message: 'Please input your email!', type: 'email' }]}
-                >
-                    <Input />
-                </Form.Item>
+                {isRegister ? (
+                    <>
+                        <Form.Item<FieldType>
+                            label="Email"
+                            name="email"
+                            rules={[{ required: true, message: 'Please input your email!', type: 'email' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+
+                        <Form.Item<FieldType>
+                            label="Username"
+                            name="username"
+                            rules={[{ required: true, message: 'Please input your username!' }]}
+                        >
+                            <Input />
+                        </Form.Item>
+                    </>
+                ) : (
+                    <Form.Item<FieldType>
+                        label="Email/Username"
+                        name="emailOrUsername"
+                        rules={[{ required: true, message: 'Please input your email or username!' }]}
+                    >
+                        <Input placeholder="Enter email or username" />
+                    </Form.Item>
+                )}
 
                 <Form.Item<FieldType>
                     label="Password"
@@ -75,14 +104,14 @@ const AuthForm: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item label={null}>
-                    <Button type="primary" htmlType="submit" block>
+                    <Button type="primary" htmlType="submit" block loading={isLoading}>
                         {isRegister ? 'Sign Up' : 'Sign In'}
                     </Button>
                 </Form.Item>
 
                 <Form.Item label={null}>
                     <Button type="link" block onClick={() => setIsRegister(!isRegister)}>
-                        {isRegister ? 'Already have an account? Sign in' : 'Don’t have an account? Sign up'}
+                        {isRegister ? 'Already have an account? Sign in' : 'Don\'t have an account? Sign up'}
                     </Button>
                 </Form.Item>
             </Form>
