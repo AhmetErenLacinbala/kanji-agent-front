@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { createGuestUser, _register, _login, type GuestUserResponse, type AuthResponse, type RegisterPayload, type LoginPayload } from '../services/auth'
+import { createGuestUser, _register, _login, type AuthResponse, type RegisterPayload, type LoginPayload } from '../services/auth'
 
 interface AuthState {
     accessToken: string | null

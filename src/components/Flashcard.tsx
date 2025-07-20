@@ -34,7 +34,6 @@ const Flashcard = () => {
     const [showMeaning, setShowMeaning] = useState(false)
     const [showKana, setShowKana] = useState(false)
     const [loading, setLoading] = useState(true)
-    const [correctAnswers, setCorrectAnswers] = useState<string[]>([])
 
     // Spaced repetition state
     const [kanjiProgress, setKanjiProgress] = useState<Map<string, KanjiProgress>>(new Map())
@@ -77,7 +76,6 @@ const Flashcard = () => {
                 message.error('Failed to load flashcards. Please try again.')
             } finally {
                 setLoading(false)
-                setCorrectAnswers([])
             }
         }
 
