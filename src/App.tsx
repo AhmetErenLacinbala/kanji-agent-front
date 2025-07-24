@@ -78,6 +78,12 @@ function App() {
         >
           Decks
         </button>
+        <button
+          className="bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-orange-600 transition"
+          onClick={() => navigate('/debug')}
+        >
+          🐛 Debug Question
+        </button>
       </div>
 
       <FloatButton.Group trigger="hover" type="primary" style={{ right: 24, bottom: 24 }}>

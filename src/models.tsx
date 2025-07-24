@@ -44,7 +44,6 @@ export interface Deck {
   id: string
   name?: string
   isAnonymous: boolean
-  // Add other deck properties as needed
 }
 
 export interface DeckServiceResult {
